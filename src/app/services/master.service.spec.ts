@@ -2,7 +2,7 @@ import { MasterService } from './master.service';
 import { ValueService } from './value.service';
 import { FakeValueService } from './fake.value.service';
 
-fdescribe('MasterService', () => {
+describe('MasterService', () => {
   let vs: ValueService;
   let ms: MasterService;
 
@@ -30,4 +30,14 @@ fdescribe('MasterService', () => {
     const ms = new MasterService(fake as ValueService);
     expect(ms.getValue()).toBe('Valor falso obj');
   });
+
+  it('Should call to getValue from ValueService', () => {
+    const vs: jasmine.SpyObj<ValueService> = jasmine.createSpyObj('ValueService', ['getValue']);
+    vs.getValue.and.returnValue('Valor falso');
+    const ms = new MasterService(vs);
+    expect(ms.getValue()).toBe('Valor falso');
+    expect(vs.getValue).toHaveBeenCalled();
+    expect(vs.getValue).toHaveBeenCalledTimes(1);
+  });
+
 });
