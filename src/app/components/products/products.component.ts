@@ -1,16 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 
+import { Product } from 'src/app/models/product.model';
+
+import { ProductsService } from 'src/app/services/product.service';
+
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
-  styles: [
-  ]
+  styleUrls: ['./products.component.scss']
 })
 export class ProductsComponent implements OnInit {
 
-  constructor() { }
+  productos: Product[] = [];
+
+  constructor(
+    private ps: ProductsService,
+  ) { }
 
   ngOnInit(): void {
+    this.getAllProducts();
+  }
+
+  getAllProducts() {
+    this.ps.getAllSimple()
+      .subscribe(products => this.productos = products);
   }
 
 }

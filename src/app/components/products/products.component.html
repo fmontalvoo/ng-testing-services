@@ -1,3 +1,11 @@
 <section class="container">
   <h1>Products component</h1>
+  <div class="my-grid">
+    <figure *ngFor="let producto of productos">
+      <img [src]="producto.images[0]" alt="">
+      <figcaption>
+        {{ producto.title }} - ${{ producto.price }}
+      </figcaption>
+    </figure>
+  </div>
 </section>
