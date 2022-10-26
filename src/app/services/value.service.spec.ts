@@ -1,11 +1,14 @@
-import { waitForAsync } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { ValueService } from './value.service';
 
 describe('ValueService', () => {
   let service: ValueService;
 
   beforeEach(() => {
-    service = new ValueService();
+    TestBed.configureTestingModule({
+      providers: [ValueService]
+    });
+    service = TestBed.inject(ValueService);
   });
 
   it('Should be created', () => {
