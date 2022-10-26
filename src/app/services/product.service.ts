@@ -9,7 +9,7 @@ import { environment } from './../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class ProductsService {
+export class ProductService {
 
   private apiUrl = `${environment.api_url}/products`;
 
