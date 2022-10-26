@@ -1,43 +1,53 @@
+import { TestBed } from '@angular/core/testing';
+
 import { MasterService } from './master.service';
 import { ValueService } from './value.service';
 import { FakeValueService } from './fake.value.service';
 
 describe('MasterService', () => {
-  let vs: ValueService;
   let ms: MasterService;
+  let vss: jasmine.SpyObj<ValueService>;
 
   beforeEach(() => {
-    vs = new ValueService();
-    ms = new MasterService(vs);
+    const spy: jasmine.SpyObj<ValueService> = jasmine.createSpyObj('ValueService', ['getValue']);
+
+    TestBed.configureTestingModule({
+      providers: [
+        MasterService,
+        { provide: ValueService, useValue: spy } // Cuando trate de inyectar a ValueService utilizara el espia en su lugar.
+      ]
+    });
+    ms = TestBed.inject(MasterService);
+    vss = TestBed.inject(ValueService) as jasmine.SpyObj<ValueService>;
   });
 
-  it('should be created', () => {
+  it('Should be created', () => {
     expect(ms).toBeTruthy();
   });
 
-  it('Should return the value from Promise', () => {
+  xit('Should return the value from Promise', () => {
     expect(ms.getValue()).toBe('Valor');
   });
 
-  it('Should return a value from a fake service', () => {
+  xit('Should return a value from a fake service', () => {
     const fvs = new FakeValueService();
     const ms = new MasterService(fvs as unknown as ValueService);
     expect(ms.getValue()).toBe('Valor falso');
   });
 
-  it('Should return a value from a fake object', () => {
+  xit('Should return a value from a fake object', () => {
     const fake = { getValue: () => 'Valor falso obj' };
     const ms = new MasterService(fake as ValueService);
     expect(ms.getValue()).toBe('Valor falso obj');
   });
 
   it('Should call to getValue from ValueService', () => {
-    const vs: jasmine.SpyObj<ValueService> = jasmine.createSpyObj('ValueService', ['getValue']);
-    vs.getValue.and.returnValue('Valor falso');
-    const ms = new MasterService(vs);
+    // const vs: jasmine.SpyObj<ValueService> = jasmine.createSpyObj('ValueService', ['getValue']);
+    vss.getValue.and.returnValue('Valor falso');
+    // const ms = new MasterService(vs);
     expect(ms.getValue()).toBe('Valor falso');
-    expect(vs.getValue).toHaveBeenCalled();
-    expect(vs.getValue).toHaveBeenCalledTimes(1);
+    expect(vss.getValue).toHaveBeenCalled();
+    expect(vss.getValue).toHaveBeenCalledTimes(1);
   });
 
 });
