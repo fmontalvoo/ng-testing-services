@@ -48,7 +48,7 @@ export class ProductService {
     );
   }
 
-  getOne(id: string) {
+  getOne(id: string | number) {
     return this.http.get<Product>(`${this.apiUrl}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) => {

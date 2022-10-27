@@ -7,6 +7,7 @@ import { ProductService } from './product.service';
 
 import { environment } from 'src/environments/environment';
 import { generateProduct, generateProducts } from '../data/product.mock';
+import { HttpStatusCode } from '@angular/common/http';
 
 fdescribe('ProductService', () => {
   let ps: ProductService;
@@ -201,6 +202,97 @@ fdescribe('ProductService', () => {
       expect(req.request.method).toEqual('DELETE'); // Verifica el metodo utilizado en la llamada al servicio.
 
       req.flush(mockData); // Reemplaza la data de la peticion con mockData.
+    });
+  });
+
+  describe('Test for getOne', () => {
+    it('Should return a product', (doneFn) => {
+      const mockData = generateProduct();
+      const productId = mockData.id;
+
+      ps.getOne(productId)
+        .subscribe(prod => {
+          expect(prod).toEqual(mockData);
+          doneFn();
+        });
+
+      // Http config
+      const req = http.expectOne(`${environment.api_url}/products/${productId}`); // Intercepta la peticion a la url.
+      req.flush(mockData); // Reemplaza la data de la peticion con mockData.
+
+      expect(req.request.method).toEqual('GET');
+    });
+
+    it('Should return not found error', (doneFn) => {
+      const msgErr = '404';
+      const mockError = {
+        status: HttpStatusCode.NotFound,
+        statusText: msgErr
+      };
+
+      const productId = 0;
+
+      ps.getOne(productId)
+        .subscribe({
+          error(err) {
+            expect(err).toEqual('El producto no existe');
+            doneFn();
+          }
+        });
+
+      // Http config
+      const req = http.expectOne(`${environment.api_url}/products/${productId}`); // Intercepta la peticion a la url.
+      req.flush(msgErr, mockError); // Reemplaza la data de la peticion con mockData.
+
+      expect(req.request.method).toEqual('GET');
+    });
+
+    it('Should return unauthorized error', (doneFn) => {
+      const msgErr = '401';
+      const mockError = {
+        status: HttpStatusCode.Unauthorized,
+        statusText: msgErr
+      };
+
+      const productId = 0;
+
+      ps.getOne(productId)
+        .subscribe({
+          error(err) {
+            expect(err).toEqual('No estas permitido');
+            doneFn();
+          }
+        });
+
+      // Http config
+      const req = http.expectOne(`${environment.api_url}/products/${productId}`); // Intercepta la peticion a la url.
+      req.flush(msgErr, mockError); // Reemplaza la data de la peticion con mockData.
+
+      expect(req.request.method).toEqual('GET');
+    });
+
+    it('Should return unknow error', (doneFn) => {
+      const msgErr = '400';
+      const mockError = {
+        status: HttpStatusCode.BadRequest,
+        statusText: msgErr
+      };
+
+      const productId = 0;
+
+      ps.getOne(productId)
+        .subscribe({
+          error(err) {
+            expect(err).toEqual('Ups algo salio mal');
+            doneFn();
+          }
+        });
+
+      // Http config
+      const req = http.expectOne(`${environment.api_url}/products/${productId}`); // Intercepta la peticion a la url.
+      req.flush(msgErr, mockError); // Reemplaza la data de la peticion con mockData.
+
+      expect(req.request.method).toEqual('GET');
     });
   });
 
