@@ -1,15 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpStatusCode, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product.model';
 
 import { ProductService } from './product.service';
+import { TokenInterceptor } from '../interceptors/token.interceptor';
+
+import { generateProduct, generateProducts } from '../data/product.mock';
 
 import { environment } from 'src/environments/environment';
-import { generateProduct, generateProducts } from '../data/product.mock';
-import { HttpStatusCode } from '@angular/common/http';
+import { TokenService } from './token.service';
 
 fdescribe('ProductService', () => {
+  let ts: TokenService;
   let ps: ProductService;
   let http: HttpTestingController;
 
@@ -19,9 +23,16 @@ fdescribe('ProductService', () => {
         HttpClientTestingModule
       ],
       providers: [
-        ProductService
+        TokenService,
+        ProductService,
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: TokenInterceptor,
+          multi: true
+        }
       ],
     });
+    ts = TestBed.inject(TokenService);
     ps = TestBed.inject(ProductService);
     http = TestBed.inject(HttpTestingController);
   });
@@ -293,6 +304,20 @@ fdescribe('ProductService', () => {
       req.flush(msgErr, mockError); // Reemplaza la data de la peticion con mockData.
 
       expect(req.request.method).toEqual('GET');
+    });
+  });
+
+  describe('Test for TokenInterceptor', () => {
+    it('Should return the token value', () => {
+      const token = 'Token.123';
+      spyOn(ts, 'get').and.returnValue(token);
+
+      ps.getAllSimple()
+        .subscribe();
+
+      const req = http.expectOne(`${environment.api_url}/products`); // Intercepta la peticion a la url.
+      const headers = req.request.headers;
+      expect(headers.get('Authorization')).toBe(`Bearer ${token}`);
     });
   });
 
