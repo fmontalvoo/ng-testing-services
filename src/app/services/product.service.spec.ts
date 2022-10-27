@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { CreateProductDTO, Product } from '../models/product.model';
+import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product.model';
 
 import { ProductService } from './product.service';
 
@@ -154,7 +154,53 @@ fdescribe('ProductService', () => {
       expect(req.request.body).toEqual(createProduct); // Verifica la data enviada al servicio.
 
       // http.verify(); // Verifica y agrega la data de mockData.
+    });
+  });
 
+  describe('Tests for update products', () => {
+    it('Should return a updated product', (doneFn) => {
+      const mockData = generateProduct();
+      const updateProduct: UpdateProductDTO = {
+        price: 42,
+        title: 'Product#2',
+        description: 'Product description',
+      };
+
+      const productId = mockData.id;
+
+      ps.update(productId, { ...updateProduct })
+        .subscribe(prod => {
+          expect(prod).toEqual(mockData);
+          doneFn();
+        });
+
+      // Http config
+      const req = http.expectOne(`${environment.api_url}/products/${productId}`); // Intercepta la peticion a la url.
+
+      expect(req.request.method).toEqual('PUT'); // Verifica el metodo utilizado en la llamada al servicio.
+      expect(req.request.body).toEqual(updateProduct); // Verifica la data enviada al servicio.
+
+      req.flush(mockData); // Reemplaza la data de la peticion con mockData.
+    });
+  });
+
+  describe('Tests for delete products', () => {
+    it('Should delete a product', (doneFn) => {
+      const mockData = true;
+      const productId = generateProduct().id;
+
+      ps.delete(productId)
+        .subscribe(res => {
+          expect(res).toEqual(mockData);
+          doneFn();
+        });
+
+      // Http config
+      const req = http.expectOne(`${environment.api_url}/products/${productId}`); // Intercepta la peticion a la url.
+
+      expect(req.request.method).toEqual('DELETE'); // Verifica el metodo utilizado en la llamada al servicio.
+
+      req.flush(mockData); // Reemplaza la data de la peticion con mockData.
     });
   });
 

@@ -70,11 +70,11 @@ export class ProductService {
     return this.http.post<Product>(this.apiUrl, dto);
   }
 
-  update(id: string, dto: UpdateProductDTO) {
+  update(id: string | number, dto: UpdateProductDTO) {
     return this.http.put<Product>(`${this.apiUrl}/${id}`, dto);
   }
 
-  delete(id: string) {
+  delete(id: string | number) {
     return this.http.delete<boolean>(`${this.apiUrl}/${id}`);
   }
 }
