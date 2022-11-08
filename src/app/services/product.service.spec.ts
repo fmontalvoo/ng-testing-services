@@ -12,7 +12,7 @@ import { generateProduct, generateProducts } from '../data/product.mock';
 import { environment } from 'src/environments/environment';
 import { TokenService } from './token.service';
 
-fdescribe('ProductService', () => {
+describe('ProductService', () => {
   let ts: TokenService;
   let ps: ProductService;
   let http: HttpTestingController;
